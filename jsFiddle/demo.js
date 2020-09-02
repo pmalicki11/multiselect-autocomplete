@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // const foundItems = requestItems(inputString);
     clearMultiselectDropdownList();
     let dropdownElements = '';
+    
     foundItems.forEach((item, i) => {
       dropdownElements += `<li class="multiselect-dropdown-item" data-index="${i}">${item}</li>`;
     });
@@ -25,14 +26,12 @@ document.addEventListener('DOMContentLoaded', function() {
     multiselectDropdownList.innerHTML = dropdownElements;
     
     Array.from(multiselectDropdownList.children).forEach(li => {
-      li.addEventListener('mouseover', e => {
-        if(highlightedDropdownItem != null)
-          highlightedDropdownItem.classList.remove('multiselect-dropdown-item-highlighted');
-        highlightedDropdownItem = e.target;
-        highlightedDropdownItem.classList.add('multiselect-dropdown-item-highlighted');
-        console.log(e.target.getAttribute('data-index'));
+      li.addEventListener('mouseover', e => {  
+        highlightDropdownItem(e.target);
       });
     });
+
+    highlightDropdownItem(multiselectDropdownList.children[0]);
   }
 
   multiselectTextInput.addEventListener('keydown', e => {
@@ -52,21 +51,11 @@ document.addEventListener('DOMContentLoaded', function() {
     multiselectDropdownList.innerHTML = "";
   }
 
-  function highlightNextDropdownItem() {
-    if(highlightedDropdownItem == null) {
-      highlightFirstDropdownItem();
-      return;
-    }
-    let nextItemIndex = highlightedDropdownItem.getAttribute('data-index') + + 1;
-    highlightedDropdownItem.classList.remove('multiselect-dropdown-item-highlighted');
-    highlightedDropdownItem = document.querySelector("li[data-index='" + nextItemIndex + "']");
-    highlightedDropdownItem.classList.add('multiselect-dropdown-item-highlighted')
-  }
-
-  function highlightFirstDropdownItem() {
-    highlightedDropdownItem = document.querySelector('[data-index="0"]');
-    console.log(highlightedDropdownItem);
-    highlightedDropdownItem.classList.add('multiselect-dropdown-item-highlighted')
+  function highlightDropdownItem(item) {
+    if(highlightedDropdownItem != null)
+      highlightedDropdownItem.classList.remove('multiselect-dropdown-item-highlighted');
+    highlightedDropdownItem = item;
+    highlightedDropdownItem.classList.add('multiselect-dropdown-item-highlighted');
   }
 
 });
