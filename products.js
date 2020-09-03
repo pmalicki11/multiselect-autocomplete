@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', function() {
       clearMultiselectDropdownList();
     } else if(e.key === 'ArrowUp') {
       e.preventDefault();
-      //highlightPreviousDropdownItem();
+      highlightPreviousDropdownItem();
     } else if(e.key === 'ArrowDown') {
       e.preventDefault();
       highlightNextDropdownItem();
@@ -58,4 +58,29 @@ document.addEventListener('DOMContentLoaded', function() {
     highlightedDropdownItem.classList.add('multiselect-dropdown-item-highlighted');
   }
 
+  function highlightNextDropdownItem() {
+    console.log(highlightedDropdownItem);
+    if(highlightedDropdownItem) {
+      highlightedDropdownItem.classList.remove('multiselect-dropdown-item-highlighted');
+      if(highlightedDropdownItem.nextSibling) {
+        highlightedDropdownItem = highlightedDropdownItem.nextSibling;
+      } else {
+        highlightedDropdownItem = highlightedDropdownItem.parentNode.firstChild;
+      }
+      highlightedDropdownItem.classList.add('multiselect-dropdown-item-highlighted');
+    }
+  }
+
+  function highlightPreviousDropdownItem() {
+    console.log(highlightedDropdownItem);
+    if(highlightedDropdownItem) {
+      highlightedDropdownItem.classList.remove('multiselect-dropdown-item-highlighted');
+      if(highlightedDropdownItem.previousSibling) {
+        highlightedDropdownItem = highlightedDropdownItem.previousSibling;
+      } else {
+        highlightedDropdownItem = highlightedDropdownItem.parentNode.lastChild;
+      }
+      highlightedDropdownItem.classList.add('multiselect-dropdown-item-highlighted');
+    }
+  }
 });
