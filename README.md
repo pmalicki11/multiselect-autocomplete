@@ -1,6 +1,9 @@
 # multiselect-autocomplete
 JS Component. Input with multiselect and autocomplete functionality.
 
+Preview is temporary not fully functional.
+
+//******************************************
 Preview here
 https://pmalicki11.github.io/multiselect-autocomplete/
 
