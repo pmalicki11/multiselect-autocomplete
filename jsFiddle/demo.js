@@ -1,4 +1,4 @@
-const hardCodedItems = ["Mleko","Miód", "Orzechy arachidowe","Olej kokosowy","Orzechy laskowe","Benzoensan sodu"];
+//const hardCodedItems = ["Mleko","Miód", "Orzechy arachidowe","Olej kokosowy","Orzechy laskowe","Benzoensan sodu"];
 
 document.addEventListener('DOMContentLoaded', function() {
   const multiselectTextInput = document.querySelector('.multiselect-text-input');
