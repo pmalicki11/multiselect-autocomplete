@@ -1,30 +1,29 @@
-const foundItems = ["Mleko","Miód", "Orzechy arachidowe","Olej kokosowy","Orzechy laskowe","Benzoensan sodu"];
+const hardCodedItems = ["Mleko","Miód", "Orzechy arachidowe","Olej kokosowy","Orzechy laskowe","Benzoensan sodu"];
 
 document.addEventListener('DOMContentLoaded', function() {
   const multiselectTextInput = document.querySelector('.multiselect-text-input');
   multiselectTextInput.addEventListener('input', e => {
-    console.log('Request for: "' + e.target.value + '"');
     if(!e.target.value == "")
-      generateMultiselectDropdownList(e.target.value);
+      requestItems(e.target.value);
+      //generateMultiselectDropdownList(hardCodedItems);
     else
       clearMultiselectDropdownList();
   });
 
+  
   let highlightedDropdownItem = null;
   const multiselectDropdownList = document.querySelector('.multiselect-dropdown-list');
+  
 
-  function generateMultiselectDropdownList(inputString) {
-    // normally it should send ajax request and get the values
-    // const foundItems = requestItems(inputString);
+  function generateMultiselectDropdownList(items) {
     clearMultiselectDropdownList();
     let dropdownElements = '';
-    
-    foundItems.forEach((item, i) => {
+    items.forEach((item, i) => {
       dropdownElements += `<li class="multiselect-dropdown-item" data-index="${i}">${item}</li>`;
     });
-    //console.log('Dropdown elements: ' + dropdownElements)
+
     multiselectDropdownList.innerHTML = dropdownElements;
-    
+
     Array.from(multiselectDropdownList.children).forEach(li => {
       li.addEventListener('mouseover', e => {  
         highlightDropdownItem(e.target);
@@ -34,8 +33,21 @@ document.addEventListener('DOMContentLoaded', function() {
     highlightDropdownItem(multiselectDropdownList.children[0]);
   }
 
+
+  function requestItems(inputString) {
+    const requestAddress = `http://pmalicki.com/alergens/products/ajax?namepart=${inputString}`;
+    fetch(requestAddress)
+    .then((response) => response.json())
+    .then((data) => {
+      console.log(data);
+      generateMultiselectDropdownList(data);
+    })
+    .catch((e) => multiselectDropdownList.innerHTML = '<li>Nothing found</li>');
+    multiselectDropdownList.innerHTML = '<li>Searching...</li>';
+  }
+
+
   multiselectTextInput.addEventListener('keydown', e => {
-    console.log('Keydown: "' + e.key + '"');
     if(e.key === 'Escape') {
       clearMultiselectDropdownList();
     } else if(e.key === 'ArrowUp') {
@@ -47,9 +59,15 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }, false);
 
+
+  function showSearchingInfo() {
+    
+  }
+
   function clearMultiselectDropdownList() {
     multiselectDropdownList.innerHTML = "";
   }
+
 
   function highlightDropdownItem(item) {
     if(highlightedDropdownItem != null)
@@ -58,8 +76,8 @@ document.addEventListener('DOMContentLoaded', function() {
     highlightedDropdownItem.classList.add('multiselect-dropdown-item-highlighted');
   }
 
+
   function highlightNextDropdownItem() {
-    console.log(highlightedDropdownItem);
     if(highlightedDropdownItem) {
       highlightedDropdownItem.classList.remove('multiselect-dropdown-item-highlighted');
       if(highlightedDropdownItem.nextSibling) {
@@ -71,8 +89,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 
+
   function highlightPreviousDropdownItem() {
-    console.log(highlightedDropdownItem);
     if(highlightedDropdownItem) {
       highlightedDropdownItem.classList.remove('multiselect-dropdown-item-highlighted');
       if(highlightedDropdownItem.previousSibling) {
