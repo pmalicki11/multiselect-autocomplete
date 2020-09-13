@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
   function requestItems(inputString) {
-    const requestAddress = `http://pmalicki.com/alergens/products/ajax?namepart=${inputString}`;
+    const requestAddress = `https://pmalicki.com/alergens/products/ajax?namepart=${inputString}`;
     fetch(requestAddress)
     .then((response) => response.json())
     .then((data) => {
