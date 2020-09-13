@@ -87,16 +87,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
   function clearMultiselectDropdownList() {
     multiselectDropdownList.innerHTML = '';
+	highlightedDropdownItem = null;
   }
 
   
   function showSearchingInfo() {
     multiselectDropdownList.innerHTML = '<li>Searching...</li>';
+    highlightedDropdownItem = null;
   }
 
 
   function showNothingFound() {
     multiselectDropdownList.innerHTML = '<li>Nothing found</li>'
+    highlightedDropdownItem = null;
   }
 
 
@@ -113,6 +116,10 @@ document.addEventListener('DOMContentLoaded', function() {
       e.preventDefault();
       if(highlightedDropdownItem) {
         addToSelectedItems(highlightedDropdownItem.innerHTML);
+      }
+    } else if(e.key === 'Backspace') {
+      if(multiselectTextInput.value == '') {
+        removeLastSelectedItem();
       }
     }
   });
@@ -132,6 +139,7 @@ document.addEventListener('DOMContentLoaded', function() {
     multiselectSelectedItems.appendChild(li);
     clearInput();
     focusOnInput();
+    highlightedDropdownItem = null;
   }
 
 
@@ -148,6 +156,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
   function removeSelectedItem() {
     multiselectSelectedItems.removeChild(this.parentNode);
+  }
+
+
+  function removeLastSelectedItem() {
+    if(multiselectSelectedItems.childElementCount > 0) {
+      multiselectSelectedItems.removeChild(multiselectSelectedItems.lastChild);
+    }
   }
 
 
