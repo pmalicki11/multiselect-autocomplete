@@ -1,3 +1,4 @@
+
 class Dropdown {
   
   constructor(node) {
@@ -5,8 +6,15 @@ class Dropdown {
     this.highlightedItem = null;
   }
 
+
   addItems(items) {
-    this.dropdownNode.innerHTML = items;
+    let dropdownElements = '';
+    items.forEach((item, i) => {
+      if(!isItemSelected(item)) {
+        dropdownElements += `<li class="multiselect-dropdown-item" data-index="${i}">${item}</li>`;
+      }
+    });
+    this.dropdownNode.innerHTML = dropdownElements;
     Array.from(this.dropdownNode.children).forEach((li) => {
       li.addEventListener('mouseover', (e) => {  
         this.highlightItem(e.target);
@@ -17,9 +25,11 @@ class Dropdown {
     });
   }
 
+
   highlightFirstItem() {
     this.highlightItem(this.dropdownNode.children[0]);
   }
+
 
   highlightItem(item) {
     if(this.highlightedItem != null){
@@ -28,27 +38,66 @@ class Dropdown {
     this.highlightedItem = item;
     this.highlightedItem.classList.add('multiselect-dropdown-item-highlighted');
   }
+
+
+  highlightNextItem() {
+    if(this.highlightedItem) {
+      this.highlightedItem.classList.remove('multiselect-dropdown-item-highlighted');
+      if(this.highlightedItem.nextSibling) {
+        this.highlightedItem = this.highlightedItem.nextSibling;
+      } else {
+        this.highlightedItem = this.highlightedItem.parentNode.firstChild;
+      }
+      this.highlightedItem.classList.add('multiselect-dropdown-item-highlighted');
+    }
+  }
+
+
+  highlightPreviousItem() {
+    if(this.highlightedItem) {
+      this.highlightedItem.classList.remove('multiselect-dropdown-item-highlighted');
+      if(this.highlightedItem.previousSibling) {
+        this.highlightedItem = this.highlightedItem.previousSibling;
+      } else {
+        this.highlightedItem = this.highlightedItem.parentNode.lastChild;
+      }
+      this.highlightedItem.classList.add('multiselect-dropdown-item-highlighted');
+    }
+  }
+
+
+  message(msg) {
+    this.dropdownNode.innerHTML = `<li>${msg}</li>`;
+    this.resetHighlightedItem();
+  }
+
+
+  clear() {
+    this.dropdownNode.innerHTML = '';
+    this.resetHighlightedItem();
+  }
+
+  resetHighlightedItem() {
+    this.highlightedItem = null;
+  }
 }
 
 
 
 document.addEventListener('DOMContentLoaded', function() {
-  let highlightedDropdownItem = null;
   const multiselectinputWrapper = document.querySelector('.multiselect-input-wrapper');
   const multiselectSelectedItems = document.querySelector('.multiselect-selected-list');
   const multiselectTextInput = document.querySelector('.multiselect-text-input');
   const multiselectDropdownList = document.querySelector('.multiselect-dropdown-list');
   const dropdown = new Dropdown(multiselectDropdownList);
 
-
   multiselectinputWrapper.addEventListener('click', focusOnInput);
-
 
   multiselectTextInput.addEventListener('input', (e) => {
     if(!e.target.value == '') {
       requestItems(e.target.value);
     } else {
-      clearMultiselectDropdownList();
+      dropdown.clear();
     }
   });
   
@@ -59,82 +108,31 @@ document.addEventListener('DOMContentLoaded', function() {
     .then((data) => {
       generateMultiselectDropdownList(data);
     })
-    .catch(showNothingFound);
-    showSearchingInfo();
+    .catch(dropdown.message('Nothing found'));
+    dropdown.message('Searching...');
   }
 
 
   function generateMultiselectDropdownList(items) {
-    clearMultiselectDropdownList();
-    let dropdownElements = '';
-    items.forEach((item, i) => {
-      if(!isItemSelected(item)) {
-        dropdownElements += `<li class="multiselect-dropdown-item" data-index="${i}">${item}</li>`;
-      }
-    });
-
-    dropdown.addItems(dropdownElements);
+    dropdown.clear();
+    dropdown.addItems(items);
     dropdown.highlightFirstItem();
-  }
-
-
-  function highlightNextDropdownItem() {
-    if(highlightedDropdownItem) {
-      highlightedDropdownItem.classList.remove('multiselect-dropdown-item-highlighted');
-      if(highlightedDropdownItem.nextSibling) {
-        highlightedDropdownItem = highlightedDropdownItem.nextSibling;
-      } else {
-        highlightedDropdownItem = highlightedDropdownItem.parentNode.firstChild;
-      }
-      highlightedDropdownItem.classList.add('multiselect-dropdown-item-highlighted');
-    }
-  }
-
-
-  function highlightPreviousDropdownItem() {
-    if(highlightedDropdownItem) {
-      highlightedDropdownItem.classList.remove('multiselect-dropdown-item-highlighted');
-      if(highlightedDropdownItem.previousSibling) {
-        highlightedDropdownItem = highlightedDropdownItem.previousSibling;
-      } else {
-        highlightedDropdownItem = highlightedDropdownItem.parentNode.lastChild;
-      }
-      highlightedDropdownItem.classList.add('multiselect-dropdown-item-highlighted');
-    }
-  }
-
-
-  function clearMultiselectDropdownList() {
-    multiselectDropdownList.innerHTML = '';
-	highlightedDropdownItem = null;
-  }
-
-  
-  function showSearchingInfo() {
-    multiselectDropdownList.innerHTML = '<li>Searching...</li>';
-    highlightedDropdownItem = null;
-  }
-
-
-  function showNothingFound() {
-    multiselectDropdownList.innerHTML = '<li>Nothing found</li>'
-    highlightedDropdownItem = null;
   }
 
 
   multiselectTextInput.addEventListener('keydown', (e) => {
     if(e.key === 'Escape') {
-      clearMultiselectDropdownList();
+      dropdown.clear();
     } else if(e.key === 'ArrowUp') {
       e.preventDefault();
-      highlightPreviousDropdownItem();
+      dropdown.highlightPreviousItem();
     } else if(e.key === 'ArrowDown') {
       e.preventDefault();
-      highlightNextDropdownItem();
+      dropdown.highlightNextItem();
     } else if(e.key === 'Enter') {
       e.preventDefault();
-      if(highlightedDropdownItem) {
-        addToSelectedItems(highlightedDropdownItem.innerHTML);
+      if(dropdown.highlightedItem) {
+        addToSelectedItems(dropdown.highlightedItem.innerHTML);
       }
     } else if(e.key === 'Backspace') {
       if(multiselectTextInput.value == '') {
@@ -158,7 +156,7 @@ document.addEventListener('DOMContentLoaded', function() {
     multiselectSelectedItems.appendChild(li);
     clearInput();
     focusOnInput();
-    highlightedDropdownItem = null;
+    resetHighlightedItem();
   }
 
 
