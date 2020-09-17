@@ -27,6 +27,7 @@
 	margin-bottom: 4px;
 	margin-right: 3px;
 	align-items: center;
+	cursor: default;
 }
 
 .multiselect-selected-item i {
