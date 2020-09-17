@@ -1,9 +1,44 @@
+class Dropdown {
+  
+  constructor(node) {
+    this.dropdownNode = node;
+    this.highlightedItem = null;
+  }
+
+  addItems(items) {
+    this.dropdownNode.innerHTML = items;
+    Array.from(this.dropdownNode.children).forEach((li) => {
+      li.addEventListener('mouseover', (e) => {  
+        this.highlightItem(e.target);
+      });
+      li.addEventListener('click', (e) => { 
+        //this.addToSelectedItems(e.target.innerHTML);
+      });
+    });
+  }
+
+  highlightFirstItem() {
+    this.highlightItem(this.dropdownNode.children[0]);
+  }
+
+  highlightItem(item) {
+    if(this.highlightedItem != null){
+      this.highlightedItem.classList.remove('multiselect-dropdown-item-highlighted');
+    }
+    this.highlightedItem = item;
+    this.highlightedItem.classList.add('multiselect-dropdown-item-highlighted');
+  }
+}
+
+
+
 document.addEventListener('DOMContentLoaded', function() {
   let highlightedDropdownItem = null;
   const multiselectinputWrapper = document.querySelector('.multiselect-input-wrapper');
   const multiselectSelectedItems = document.querySelector('.multiselect-selected-list');
   const multiselectTextInput = document.querySelector('.multiselect-text-input');
   const multiselectDropdownList = document.querySelector('.multiselect-dropdown-list');
+  const dropdown = new Dropdown(multiselectDropdownList);
 
 
   multiselectinputWrapper.addEventListener('click', focusOnInput);
@@ -38,24 +73,8 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
 
-    multiselectDropdownList.innerHTML = dropdownElements;
-    
-    Array.from(multiselectDropdownList.children).forEach((li) => {
-      li.addEventListener('mouseover', (e) => {  
-        highlightDropdownItem(e.target);
-      });
-      li.addEventListener('click', (e) => { 
-        addToSelectedItems(e.target.innerHTML);
-      });
-    });
-    highlightDropdownItem(multiselectDropdownList.children[0]);
-  }
-
-  function highlightDropdownItem(item) {
-    if(highlightedDropdownItem != null)
-      highlightedDropdownItem.classList.remove('multiselect-dropdown-item-highlighted');
-    highlightedDropdownItem = item;
-    highlightedDropdownItem.classList.add('multiselect-dropdown-item-highlighted');
+    dropdown.addItems(dropdownElements);
+    dropdown.highlightFirstItem();
   }
 
 
