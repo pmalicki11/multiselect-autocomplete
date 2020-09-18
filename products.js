@@ -10,7 +10,7 @@ class Dropdown {
   addItems(items) {
     let dropdownElements = '';
     items.forEach((item, i) => {
-      if(!isItemSelected(item)) {
+      if(/*!isItemSelected(item)*/true) {
         dropdownElements += `<li class="multiselect-dropdown-item" data-index="${i}">${item}</li>`;
       }
     });
@@ -108,7 +108,7 @@ document.addEventListener('DOMContentLoaded', function() {
     .then((data) => {
       generateMultiselectDropdownList(data);
     })
-    .catch(dropdown.message('Nothing found'));
+    .catch((error) => dropdown.message('Nothing found'));
     dropdown.message('Searching...');
   }
 
