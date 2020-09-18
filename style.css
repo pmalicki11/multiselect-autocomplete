@@ -3,7 +3,7 @@
 	width: 80px;
 }
 
-.multiselect-input-wrapper {
+.multiselect-autocomplete-wrapper {
 	display: inline-block;
 	vertical-align: top;
 	border: solid 1px black;
@@ -12,14 +12,14 @@
 	width: 400px;
 }
 
-.multiselect-selected-list {
+.multiselect-autocomplete-selected-items {
 	display: inline-block;
 	list-style: none;
 	margin: 0px;
 	padding: 0px;
 }
 
-.multiselect-selected-item {
+.multiselect-autocomplete-selected-item {
 	display: inline-flex;
 	background-color:#d9d9d9;
 	border-radius: 5px;
@@ -30,22 +30,22 @@
 	cursor: default;
 }
 
-.multiselect-selected-item i {
+.multiselect-autocomplete-selected-item i {
 	font-size: 100%;
 }
 
-.multiselect-text-input {
+.multiselect-autocomplete-text-input {
 	display: inline;
 	padding: 0px;
 	border: none;
 }
 
-.multiselect-text-input:focus {
+.multiselect-autocomplete-text-input:focus {
 	border-style: none;
 	outline: none;
   }
 
-.multiselect-dropdown {
+.multiselect-autocomplete-dropdown {
 	position: relative;
 	left: 85px;
 	width: 404px;
@@ -54,105 +54,18 @@
 	border-radius: 5px;
 }
 
-.multiselect-dropdown-list {
+.multiselect-autocomplete-dropdown-items {
 	list-style: none;
 	margin: 0px;
 	padding: 0px;
 	border-radius: 5px;
 }
 
-.multiselect-dropdown-list li {
+.multiselect-autocomplete-dropdown-items li {
 	padding: 5px;
 	border-radius: 5px;
 }
 
-.multiselect-dropdown-item-highlighted {
+.multiselect-autocomplete-dropdown-item-highlighted {
 	background-color: #c7b300;
 }
-
-/*
-.form-input-text {
-  border-style: solid;
-  border-width: 1px;
-	border-color: gray;
-	width: 400px;
-  padding: 5px;
-  margin: 5px;
-  border-radius: 5px;
-}
-
-.chosen-container {
-	cursor: text;
-  width: 400px;
-  padding: 3px 5px;
-}
-
-.chosen-choices {
-	display: inline-block;
-	list-style: none;
-	height: auto;
-	padding: 0px;
-	margin: 0px;
-}
-
-.chosen-choices li {
-	display: flex;
-	float: left;
-	overflow: hidden;
-  cursor: default;
-  align-items: center;
-}
-
-.chosen-choices li.search-choice {
-	background-color: #d9d9d9;
-  padding: 4px;
-  margin: 2px 2px 0px 0px;
-  border-radius: 5px;
-	font-size: 80%;
-}
-
-.search-choice i {
-  margin-left: 2px;
-}
-
-.chosen-choices li.chosen-search-field {
-	border-style: none;
-}
-
-.chosen-search-input {
-  flex: 1;
-  border: 0;
-  padding: 0px;
-  outline: none;
-}
-
-.chosen-search-input:focus {
-  border-style: none;
-  outline: none;
-}
-
-.chosen-dropdown {
-	background-color: yellow;
-	margin: 0px 5px;
-	background-color: #d9d9d9;
-  padding: 0px;
-  border-radius: 5px;
-
-}
-
-.chosen-results {
-	list-style-type: none;
-	padding: 0px;
-	margin: 0px;
-}
-
-.chosen-results li {
-	padding: 5px;
-	padding-left: 40px;
-	border-radius: 5px;
-}
-
-.chosen-results li:hover {
-	background-color: #bfbfbf;
-}
-*/
