@@ -1,67 +1,43 @@
 /** Multiselect input with autocomplete functionality class */
 class MultiselectAutocomplete {
   
-  /**
-    * Create a multiselect input component with autocomplete functionality
-    */
-  constructor() {
-    this.buildStructure();
-    this.setEvents();
-    this.highlightedDropdownItem = null;
-  }
-
-  /**
-   * Build component structure
-   */
-  buildStructure() {
+  constructor(inputArea ,dropdown) {
     this.component = document.querySelector('.multiselect-autocomplete');
-    this.inputArea = document.createElement('div');
-    this.selectedItems = document.createElement('ul');
-    this.textInput = document.createElement('input');
-    this.dropdown = document.createElement('div');
-    this.dropdownItems = document.createElement('ul');
-    
-    this.inputArea.classList.add('multiselect-autocomplete-input');
-    this.selectedItems.classList.add('multiselect-autocomplete-selected-items');
-    this.textInput.classList.add('multiselect-autocomplete-text-input');
-    this.textInput.type = 'text';
-    this.textInput.autocomplete = 'off';
-    this.dropdown.classList.add('multiselect-autocomplete-dropdown');
-    this.dropdownItems.classList.add('multiselect-autocomplete-dropdown-items');
-    
-    this.inputArea.appendChild(this.selectedItems);
-    this.inputArea.appendChild(this.textInput);
-    this.dropdown.appendChild(this.dropdownItems);
+    this.inputArea = inputArea.toNode();
+    this.dropdown = dropdown.toNode()
     this.component.appendChild(this.inputArea);
     this.component.appendChild(this.dropdown);
+    this.setEvents();
   }
 
-  /**
-   * Set events for top level elements
-   */
   setEvents() {
-    this.inputArea.addEventListener('click', this.focusOnTextInput);
-    this.textInput.addEventListener('input', this.inputTextChanged);
-  }
-
-  /**
-   * Set focus on text input element
-   */
-  focusOnTextInput() {
-    this.textInput.focus();
-  }
-
-  /**
-   * Text input valie has changed
-   * @param {*} event 
-   */
-  inputTextChanged(event) {
-    if(!event.target.value == '') {
-      this.requestItems(event.target.value);
-    } else {
-      this.dropdownItems.innerHTML = '';
-      this.highlightedDropdownItem = null;
-    }
+    this.inputArea.getTextInput().addEventListener('input', (e) => {
+      if(!e.target.value == '') {
+        this.requestItems(e.target.value);
+      } else {
+        this.dropdown.clear();
+      }
+    });
+    this.inputArea.getTextInput().addEventListener('keydown', (e) => {
+      if(e.key === 'Escape') {
+        this.dropdown.clear();
+      } else if(e.key === 'ArrowUp') {
+        e.preventDefault();
+        this.dropdown.highlightPreviousItem();
+      } else if(e.key === 'ArrowDown') {
+        e.preventDefault();
+        this.dropdown.highlightNextItem();
+      } else if(e.key === 'Enter') {
+        e.preventDefault();
+        if(this.dropdown.highlightedItem) {
+          this.inputArea.addToSelectedItems(this.dropdown.highlightedItem.innerHTML);
+        }
+      } else if(e.key === 'Backspace') {
+        if(this.inputArea.textInput.value == '') {
+          this.inputArea.removeLastSelectedItem();
+        }
+      }
+    });
   }
 
   requestItems(inputString) {
@@ -69,15 +45,174 @@ class MultiselectAutocomplete {
     fetch(requestAddress)
     .then((response) => response.json())
     .then((data) => {
-      generateMultiselectDropdownList(data);
+      this.dropdown.addDropdownItems(data);
     })
-    .catch((error) =>  this.dropdownItems.innerHTML ='<li>Nothing found</li>');
-    this.dropdownItems.innerHTML ='<li>Searching...</li>'
+    .catch((error) => this.dropdown.message('Nothing found'));
+    this.dropdown.message('Searching...');
+  }
+
+  addDropdownItems(items) {
+    this.dropdown.clear();
+    let dropdownElements = '';
+    items.forEach((item, i) => {
+      if(!this.inputArea.isItemSelected(item)) {
+        dropdownElements += `
+        <li class="multiselect-dropdown-item" data-index="${i}">${item}</li>`;
+      }
+    });
+    this.dropdown.dropdownItems.innerHTML = dropdownElements;
+    Array.from(this.dropdown.dropdownItems.children).forEach((li) => {
+      li.addEventListener('mouseover', (e) => {  
+        this.dropdown.highlightItem(e.target);
+      });
+      li.addEventListener('click', (e) => { 
+        this.inputArea.addToSelectedItems(e.target.innerHTML);
+        this.dropdown.clear();
+      });
+    });
+    this.dropdown.highlightFirstItem();
   }
 
 }
 
+class Input {
+  constructor() {
+    this.buildStructure();
+    this.setEvents();
+  }
+
+  buildStructure() {
+    this.inputArea = document.createElement('div');
+    this.inputArea.classList.add('multiselect-autocomplete-input');
+    this.selectedItems = document.createElement('ul');
+    this.selectedItems.classList.add('multiselect-autocomplete-selected-items');
+    this.textInput = document.createElement('input');
+    this.textInput.classList.add('multiselect-autocomplete-text-input');
+    this.textInput.type = 'text';
+    this.textInput.autocomplete = 'off';
+    this.inputArea.appendChild(this.selectedItems);
+    this.inputArea.appendChild(this.textInput);
+  }
+
+  setEvents() {
+    this.inputArea.addEventListener('click', () => this.textInput.focus());
+  }
+
+  addToSelectedItems(item) {
+    const li = document.createElement('li');
+    const i = document.createElement('i');
+    
+    li.classList.add('multiselect-selected-item');
+    li.innerHTML = `<span>${item}</span>`;
+    i.classList.add('material-icons');
+    i.innerHTML = 'clear';
+    i.addEventListener('click', this.removeSelectedItem);
+
+    li.appendChild(i);
+    this.selectedItems.appendChild(li);
+    this.textInput.value = '';
+    this.textInput.focus();
+  }
+
+  removeSelectedItem() {
+    this.selectedItems.removeChild(this.parentNode);
+  }
+  
+  removeLastSelectedItem() {
+    if(this.selectedItems.childElementCount > 0) {
+      this.selectedItems.removeChild(this.selectedItems.lastChild);
+    }
+  }
+
+  isItemSelected(item) {
+    let isSelected = false;
+    if(this.selectedItems.children.length > 0) {
+      Array.from(this.selectedItems.children).forEach((li) => {
+        if(li.firstChild.innerHTML == item) {
+          isSelected = true;
+          return;
+        }
+      });
+    }
+    return isSelected;
+  }
+  
+  getTextInput() {
+    return this.textInput;
+  }
+
+  toNode() {
+    return this.inputArea;
+  }
+}
+
+class Dropdown {
+  constructor() {
+    this.dropdown = document.createElement('div');
+    this.dropdown.classList.add('multiselect-autocomplete-dropdown');
+    this.dropdownItems = document.createElement('ul');
+    this.dropdownItems.classList.add('multiselect-autocomplete-dropdown-items');
+    this.dropdown.appendChild(this.dropdownItems);
+    this.highlightedItem = null;
+    this.highlightClass = 'multiselect-dropdown-item-highlighted';
+  }
+
+  highlightItem(item) {
+    if(this.highlightedItem != null){
+      this.highlightedItem.classList.remove(this.highlightClass);
+    }
+    this.highlightedItem = item;
+    this.highlightedItem.classList.add(this.highlightClass);
+  }
+
+  highlightFirstItem() {
+    this.highlightItem(this.dropdownItems.children[0]);
+  }
+
+  highlightNextItem() {
+    if(this.highlightedItem) {
+      this.highlightedItem.classList.remove(this.highlightClass);
+      if(this.highlightedItem.nextSibling) {
+        this.highlightedItem = this.highlightedItem.nextSibling;
+      } else {
+        this.highlightedItem = this.highlightedItem.parentNode.firstChild;
+      }
+      this.highlightedItem.classList.add(this.highlightClass);
+    }
+  }
+
+  highlightPreviousItem() {
+    if(this.highlightedItem) {
+      this.highlightedItem.classList.remove(this.highlightClass);
+      if(this.highlightedItem.previousSibling) {
+        this.highlightedItem = this.highlightedItem.previousSibling;
+      } else {
+        this.highlightedItem = this.highlightedItem.parentNode.lastChild;
+      }
+      this.highlightedItem.classList.add(this.highlightClass);
+    }
+  }
+
+  message(msg) {
+    this.dropdownNode.innerHTML = `<li>${msg}</li>`;
+    this.resetHighlightedItem();
+  }
+
+  resetHighlightedItem() {
+    this.highlightedItem = null;
+  }
+
+  clear() {
+    this.dropdownItems.innerHTML = '';
+    this.resetHighlightedItem();
+  }
+
+  toNode() {
+    return this.dropdown;
+  }
+}
+
 
 document.addEventListener('DOMContentLoaded', function() {
-  const multiselectAutocomplete = new MultiselectAutocomplete();
+  const multiselectAutocomplete = new MultiselectAutocomplete(new Input(), new Dropdown());
 });
