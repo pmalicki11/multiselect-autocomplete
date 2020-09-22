@@ -1,175 +1,134 @@
-document.addEventListener('DOMContentLoaded', function() {
-  let highlightedDropdownItem = null;
-  const multiselectinputWrapper = document.querySelector('.multiselect-input-wrapper');
-  const multiselectSelectedItems = document.querySelector('.multiselect-selected-list');
-  const multiselectTextInput = document.querySelector('.multiselect-text-input');
-  const multiselectDropdownList = document.querySelector('.multiselect-dropdown-list');
-
-
-  multiselectinputWrapper.addEventListener('click', focusOnInput);
-
-
-  multiselectTextInput.addEventListener('input', (e) => {
-    if(!e.target.value == '') {
-      requestItems(e.target.value);
-    } else {
-      clearMultiselectDropdownList();
-    }
-  });
+/** Multiselect input with autocomplete functionality class */
+class MultiselectAutocomplete {
   
-  function requestItems(inputString) {
+  constructor(inputArea ,dropdown) {
+    this.component = document.querySelector('.multiselect-autocomplete');
+    this.inputLabel = document.createElement('label');
+    this.inputLabel.innerHTML = 'Ingredients';
+    this.inputLabel.setAttribute('for', 'multiselect-autocomplete-text-input');
+    this.inputArea = inputArea;
+    this.dropdown = dropdown;
+    this.component.appendChild(this.inputLabel);
+    this.component.appendChild(inputArea.toNode());
+    this.component.appendChild(dropdown.toNode());
+    this.setEvents();
+  }
+
+  setEvents() {
+    this.inputArea.textInput.addEventListener('input', (e) => {
+      if(!e.target.value == '') {
+        this.requestItems(e.target.value);
+      } else {
+        this.dropdown.clear();
+      }
+    });
+    this.inputArea.textInput.addEventListener('keydown', (e) => {
+      if(e.key === 'Escape') {
+        this.dropdown.clear();
+      } else if(e.key === 'ArrowUp') {
+        e.preventDefault();
+        this.dropdown.highlightPreviousItem();
+      } else if(e.key === 'ArrowDown') {
+        e.preventDefault();
+        this.dropdown.highlightNextItem();
+      } else if(e.key === 'Enter') {
+        e.preventDefault();
+        if(this.dropdown.highlightedItem) {
+          this.inputArea.addToSelectedItems(this.dropdown.highlightedItem.innerHTML);
+          this.dropdown.clear();
+        }
+      } else if(e.key === 'Backspace') {
+        if(this.inputArea.textInput.value == '') {
+          this.inputArea.removeLastSelectedItem();
+        }
+      }
+    });
+  }
+
+  requestItems(inputString) {
     const requestAddress = `https://pmalicki.com/alergens/products/ajax?namepart=${inputString}`;
     fetch(requestAddress)
     .then((response) => response.json())
     .then((data) => {
-      generateMultiselectDropdownList(data);
+      this.addDropdownItems(data);
     })
-    .catch(showNothingFound);
-    showSearchingInfo();
+    .catch((error) => this.dropdown.message('Nothing found'));
+    this.dropdown.message('Searching...');
   }
 
-
-  function generateMultiselectDropdownList(items) {
-    clearMultiselectDropdownList();
+  addDropdownItems(items) {
+    this.dropdown.clear();
     let dropdownElements = '';
     items.forEach((item, i) => {
-      if(!isItemSelected(item)) {
-        dropdownElements += `<li class="multiselect-dropdown-item" data-index="${i}">${item}</li>`;
+      if(!this.inputArea.isItemSelected(item)) {
+        dropdownElements += `
+        <li class="multiselect-dropdown-item" data-index="${i}">${item}</li>`;
       }
     });
-
-    multiselectDropdownList.innerHTML = dropdownElements;
-    
-    Array.from(multiselectDropdownList.children).forEach((li) => {
+    this.dropdown.dropdownItems.innerHTML = dropdownElements;
+    Array.from(this.dropdown.dropdownItems.children).forEach((li) => {
       li.addEventListener('mouseover', (e) => {  
-        highlightDropdownItem(e.target);
+        this.dropdown.highlightItem(e.target);
       });
       li.addEventListener('click', (e) => { 
-        addToSelectedItems(e.target.innerHTML);
+        this.inputArea.addToSelectedItems(e.target.innerHTML);
+        this.dropdown.clear();
       });
     });
-    highlightDropdownItem(multiselectDropdownList.children[0]);
+    this.dropdown.highlightFirstItem();
   }
 
-  function highlightDropdownItem(item) {
-    if(highlightedDropdownItem != null)
-      highlightedDropdownItem.classList.remove('multiselect-dropdown-item-highlighted');
-    highlightedDropdownItem = item;
-    highlightedDropdownItem.classList.add('multiselect-dropdown-item-highlighted');
+}
+
+class Input {
+  constructor() {
+    this.buildStructure();
+    this.setEvents();
   }
 
-
-  function highlightNextDropdownItem() {
-    if(highlightedDropdownItem) {
-      highlightedDropdownItem.classList.remove('multiselect-dropdown-item-highlighted');
-      if(highlightedDropdownItem.nextSibling) {
-        highlightedDropdownItem = highlightedDropdownItem.nextSibling;
-      } else {
-        highlightedDropdownItem = highlightedDropdownItem.parentNode.firstChild;
-      }
-      highlightedDropdownItem.classList.add('multiselect-dropdown-item-highlighted');
-    }
+  buildStructure() {
+    this.inputArea = document.createElement('div');
+    this.inputArea.classList.add('multiselect-autocomplete-input');
+    this.selectedItems = document.createElement('ul');
+    this.selectedItems.classList.add('multiselect-autocomplete-selected-items');
+    this.textInput = document.createElement('input');
+    this.textInput.classList.add('multiselect-autocomplete-text-input');
+    this.textInput.type = 'text';
+    this.textInput.autocomplete = 'off';
+    this.inputArea.appendChild(this.selectedItems);
+    this.inputArea.appendChild(this.textInput);
   }
 
-
-  function highlightPreviousDropdownItem() {
-    if(highlightedDropdownItem) {
-      highlightedDropdownItem.classList.remove('multiselect-dropdown-item-highlighted');
-      if(highlightedDropdownItem.previousSibling) {
-        highlightedDropdownItem = highlightedDropdownItem.previousSibling;
-      } else {
-        highlightedDropdownItem = highlightedDropdownItem.parentNode.lastChild;
-      }
-      highlightedDropdownItem.classList.add('multiselect-dropdown-item-highlighted');
-    }
+  setEvents() {
+    this.inputArea.addEventListener('click', () => this.textInput.focus());
   }
 
-
-  function clearMultiselectDropdownList() {
-    multiselectDropdownList.innerHTML = '';
-	highlightedDropdownItem = null;
-  }
-
-  
-  function showSearchingInfo() {
-    multiselectDropdownList.innerHTML = '<li>Searching...</li>';
-    highlightedDropdownItem = null;
-  }
-
-
-  function showNothingFound() {
-    multiselectDropdownList.innerHTML = '<li>Nothing found</li>'
-    highlightedDropdownItem = null;
-  }
-
-
-  multiselectTextInput.addEventListener('keydown', (e) => {
-    if(e.key === 'Escape') {
-      clearMultiselectDropdownList();
-    } else if(e.key === 'ArrowUp') {
-      e.preventDefault();
-      highlightPreviousDropdownItem();
-    } else if(e.key === 'ArrowDown') {
-      e.preventDefault();
-      highlightNextDropdownItem();
-    } else if(e.key === 'Enter') {
-      e.preventDefault();
-      if(highlightedDropdownItem) {
-        addToSelectedItems(highlightedDropdownItem.innerHTML);
-      }
-    } else if(e.key === 'Backspace') {
-      if(multiselectTextInput.value == '') {
-        removeLastSelectedItem();
-      }
-    }
-  });
-
-
-  function addToSelectedItems(item) {
+  addToSelectedItems(item) {
     const li = document.createElement('li');
     const i = document.createElement('i');
     
-    li.classList.add('multiselect-selected-item');
+    li.classList.add('multiselect-autocomplete-selected-item');
     li.innerHTML = `<span>${item}</span>`;
     i.classList.add('material-icons');
     i.innerHTML = 'clear';
-    i.addEventListener('click', removeSelectedItem);
+    i.addEventListener('click', (e) => this.selectedItems.removeChild(e.target.parentNode));
 
     li.appendChild(i);
-    multiselectSelectedItems.appendChild(li);
-    clearInput();
-    focusOnInput();
-    highlightedDropdownItem = null;
+    this.selectedItems.appendChild(li);
+    this.textInput.value = '';
+    this.textInput.focus();
   }
-
-
-  function clearInput() {
-    multiselectTextInput.value = '';
-    clearMultiselectDropdownList();
-  }
-
-
-  function focusOnInput() {
-    multiselectTextInput.focus();
-  }
-
-
-  function removeSelectedItem() {
-    multiselectSelectedItems.removeChild(this.parentNode);
-  }
-
-
-  function removeLastSelectedItem() {
-    if(multiselectSelectedItems.childElementCount > 0) {
-      multiselectSelectedItems.removeChild(multiselectSelectedItems.lastChild);
+  
+  removeLastSelectedItem() {
+    if(this.selectedItems.childElementCount > 0) {
+      this.selectedItems.removeChild(this.selectedItems.lastElementChild);
     }
   }
 
-
-  function isItemSelected(item) {
+  isItemSelected(item) {
     let isSelected = false;
-    if(multiselectSelectedItems.children.length > 0) {
-      Array.from(multiselectSelectedItems.children).forEach((li) => {
+    if(this.selectedItems.children.length > 0) {
+      Array.from(this.selectedItems.children).forEach((li) => {
         if(li.firstChild.innerHTML == item) {
           isSelected = true;
           return;
@@ -178,5 +137,83 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     return isSelected;
   }
+  
+  getTextInput() {
+    return this.textInput;
+  }
 
+  toNode() {
+    return this.inputArea;
+  }
+}
+
+class Dropdown {
+  constructor() {
+    this.dropdown = document.createElement('div');
+    this.dropdown.classList.add('multiselect-autocomplete-dropdown');
+    this.dropdownItems = document.createElement('ul');
+    this.dropdownItems.classList.add('multiselect-autocomplete-dropdown-items');
+    this.dropdown.appendChild(this.dropdownItems);
+    this.highlightedItem = null;
+    this.highlightClass = 'multiselect-autocomplete-dropdown-item-highlighted';
+  }
+
+  highlightItem(item) {
+    if(this.highlightedItem != null){
+      this.highlightedItem.classList.remove(this.highlightClass);
+    }
+    this.highlightedItem = item;
+    this.highlightedItem.classList.add(this.highlightClass);
+  }
+
+  highlightFirstItem() {
+    this.highlightItem(this.dropdownItems.children[0]);
+  }
+
+  highlightNextItem() {
+    if(this.highlightedItem) {
+      this.highlightedItem.classList.remove(this.highlightClass);
+      if(this.highlightedItem.nextElementSibling) {
+        this.highlightedItem = this.highlightedItem.nextElementSibling;
+      } else {
+        this.highlightedItem = this.highlightedItem.parentNode.firstElementChild;
+      }
+      this.highlightedItem.classList.add(this.highlightClass);
+    }
+  }
+
+  highlightPreviousItem() {
+    if(this.highlightedItem) {
+      this.highlightedItem.classList.remove(this.highlightClass);
+      if(this.highlightedItem.previousElementSibling) {
+        this.highlightedItem = this.highlightedItem.previousElementSibling;
+      } else {
+        this.highlightedItem = this.highlightedItem.parentNode.lastElementChild;
+      }
+      this.highlightedItem.classList.add(this.highlightClass);
+    }
+  }
+
+  message(msg) {
+    this.dropdownItems.innerHTML = `<li>${msg}</li>`;
+    this.resetHighlightedItem();
+  }
+
+  resetHighlightedItem() {
+    this.highlightedItem = null;
+  }
+
+  clear() {
+    this.dropdownItems.innerHTML = '';
+    this.resetHighlightedItem();
+  }
+
+  toNode() {
+    return this.dropdown;
+  }
+}
+
+
+document.addEventListener('DOMContentLoaded', function() {
+  const multiselectAutocomplete = new MultiselectAutocomplete(new Input(), new Dropdown());
 });
