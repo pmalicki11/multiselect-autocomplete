@@ -3,22 +3,22 @@ class MultiselectAutocomplete {
   
   constructor(inputArea ,dropdown) {
     this.component = document.querySelector('.multiselect-autocomplete');
-    this.inputArea = inputArea.toNode();
-    this.dropdown = dropdown.toNode()
-    this.component.appendChild(this.inputArea);
-    this.component.appendChild(this.dropdown);
+    this.inputArea = inputArea;
+    this.dropdown = dropdown;
+    this.component.appendChild(inputArea.toNode());
+    this.component.appendChild(dropdown.toNode());
     this.setEvents();
   }
 
   setEvents() {
-    this.inputArea.getTextInput().addEventListener('input', (e) => {
+    this.inputArea.textInput.addEventListener('input', (e) => {
       if(!e.target.value == '') {
         this.requestItems(e.target.value);
       } else {
         this.dropdown.clear();
       }
     });
-    this.inputArea.getTextInput().addEventListener('keydown', (e) => {
+    this.inputArea.textInput.addEventListener('keydown', (e) => {
       if(e.key === 'Escape') {
         this.dropdown.clear();
       } else if(e.key === 'ArrowUp') {
@@ -31,6 +31,7 @@ class MultiselectAutocomplete {
         e.preventDefault();
         if(this.dropdown.highlightedItem) {
           this.inputArea.addToSelectedItems(this.dropdown.highlightedItem.innerHTML);
+          this.dropdown.clear();
         }
       } else if(e.key === 'Backspace') {
         if(this.inputArea.textInput.value == '') {
@@ -45,7 +46,7 @@ class MultiselectAutocomplete {
     fetch(requestAddress)
     .then((response) => response.json())
     .then((data) => {
-      this.dropdown.addDropdownItems(data);
+      this.addDropdownItems(data);
     })
     .catch((error) => this.dropdown.message('Nothing found'));
     this.dropdown.message('Searching...');
@@ -102,25 +103,21 @@ class Input {
     const li = document.createElement('li');
     const i = document.createElement('i');
     
-    li.classList.add('multiselect-selected-item');
+    li.classList.add('multiselect-autocomplete-selected-item');
     li.innerHTML = `<span>${item}</span>`;
     i.classList.add('material-icons');
     i.innerHTML = 'clear';
-    i.addEventListener('click', this.removeSelectedItem);
+    i.addEventListener('click', (e) => this.selectedItems.removeChild(e.target.parentNode));
 
     li.appendChild(i);
     this.selectedItems.appendChild(li);
     this.textInput.value = '';
     this.textInput.focus();
   }
-
-  removeSelectedItem() {
-    this.selectedItems.removeChild(this.parentNode);
-  }
   
   removeLastSelectedItem() {
     if(this.selectedItems.childElementCount > 0) {
-      this.selectedItems.removeChild(this.selectedItems.lastChild);
+      this.selectedItems.removeChild(this.selectedItems.lastElementChild);
     }
   }
 
@@ -154,7 +151,7 @@ class Dropdown {
     this.dropdownItems.classList.add('multiselect-autocomplete-dropdown-items');
     this.dropdown.appendChild(this.dropdownItems);
     this.highlightedItem = null;
-    this.highlightClass = 'multiselect-dropdown-item-highlighted';
+    this.highlightClass = 'multiselect-autocomplete-dropdown-item-highlighted';
   }
 
   highlightItem(item) {
@@ -172,10 +169,10 @@ class Dropdown {
   highlightNextItem() {
     if(this.highlightedItem) {
       this.highlightedItem.classList.remove(this.highlightClass);
-      if(this.highlightedItem.nextSibling) {
-        this.highlightedItem = this.highlightedItem.nextSibling;
+      if(this.highlightedItem.nextElementSibling) {
+        this.highlightedItem = this.highlightedItem.nextElementSibling;
       } else {
-        this.highlightedItem = this.highlightedItem.parentNode.firstChild;
+        this.highlightedItem = this.highlightedItem.parentNode.firstElementChild;
       }
       this.highlightedItem.classList.add(this.highlightClass);
     }
@@ -184,17 +181,17 @@ class Dropdown {
   highlightPreviousItem() {
     if(this.highlightedItem) {
       this.highlightedItem.classList.remove(this.highlightClass);
-      if(this.highlightedItem.previousSibling) {
-        this.highlightedItem = this.highlightedItem.previousSibling;
+      if(this.highlightedItem.previousElementSibling) {
+        this.highlightedItem = this.highlightedItem.previousElementSibling;
       } else {
-        this.highlightedItem = this.highlightedItem.parentNode.lastChild;
+        this.highlightedItem = this.highlightedItem.parentNode.lastElementChild;
       }
       this.highlightedItem.classList.add(this.highlightClass);
     }
   }
 
   message(msg) {
-    this.dropdownNode.innerHTML = `<li>${msg}</li>`;
+    this.dropdownItems.innerHTML = `<li>${msg}</li>`;
     this.resetHighlightedItem();
   }
 
