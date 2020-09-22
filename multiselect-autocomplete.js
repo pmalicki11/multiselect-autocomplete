@@ -3,8 +3,12 @@ class MultiselectAutocomplete {
   
   constructor(inputArea ,dropdown) {
     this.component = document.querySelector('.multiselect-autocomplete');
+    this.inputLabel = document.createElement('label');
+    this.inputLabel.innerHTML = 'Ingredients';
+    this.inputLabel.setAttribute('for', 'multiselect-autocomplete-text-input');
     this.inputArea = inputArea;
     this.dropdown = dropdown;
+    this.component.appendChild(this.inputLabel);
     this.component.appendChild(inputArea.toNode());
     this.component.appendChild(dropdown.toNode());
     this.setEvents();
