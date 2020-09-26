@@ -1,7 +1,7 @@
 /** Multiselect input with autocomplete functionality class */
 class MultiselectAutocomplete {
   
-  constructor(inputArea ,dropdown) {
+  constructor(inputArea, dropdown) {
     this.component = document.querySelector('.multiselect-autocomplete');
     this.inputLabel = document.createElement('label');
     this.inputLabel.innerHTML = 'Ingredients';
