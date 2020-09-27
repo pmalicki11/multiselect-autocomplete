@@ -11,6 +11,8 @@ class MultiselectAutocomplete {
     this.input.textInput.addEventListener('input', e => {
       if(e.target.value != '') {
         this.requestItems(e.target.value);
+      } else {
+        this.dropdown.clear();
       }
     });
 
@@ -22,7 +24,11 @@ class MultiselectAutocomplete {
           break;
         case 'ArrowUp':
           e.preventDefault();
-          this.dropdown.highlightNextItem();
+          this.dropdown.highlightPreviousItem();
+          break;
+        case 'Escape':
+          e.preventDefault();
+          this.dropdown.clear();
           break;
       }
     });
@@ -32,7 +38,7 @@ class MultiselectAutocomplete {
     fetch(requestURL + inputValue)
     .then((response) => response.json())
     .then((data) => {
-      this.dropdown.populate(data);
+      this.dropdown.populate(data, this.input.addSelectedItem);
     })
     .catch((error) => this.dropdown.message('Nothing found'));
     this.dropdown.message('Searching...');
@@ -52,33 +58,51 @@ class Dropdown {
     this.highlightedIndex = -1;
   }
 
-  populate(items) {
+  populate(items, addToSelectedCallback) {
     let dropdownElementsString = '';
-    items.forEach((item) => {
+    items.forEach(item => {
       dropdownElementsString += `
         <li class="multiselect-dropdown-item">${item}</li>
       `;
     });
     this.dropdownItemsList.innerHTML = dropdownElementsString;
-    this.highlightItem(0)
+    this.highlightItem(0);
+    this.itemsArray().forEach(item => {
+      console.log(item);
+      item.addEventListener('click', addToSelectedCallback);
+    });
   }
 
   highlightItem(index) {
-    switch(index) {
-      default:
-        this.highlightedItem = this.itemsArray()[index];
+    const numOfItems = this.itemsArray().length;
+    if(numOfItems != 0) {
+      if(this.highlightedItem != null) {
+        this.highlightedItem.classList.remove(this.highlightClass);
+      }
+      switch(index) {
+        case -1:
+        this.highlightedIndex = numOfItems - 1;
+        this.highlightedItem = this.itemsArray()[this.highlightedIndex];
         break;
+      case numOfItems:
+        this.highlightedIndex = 0;
+        this.highlightedItem = this.itemsArray()[this.highlightedIndex];
+        break;
+      default:
+        this.highlightedIndex = index;
+        this.highlightedItem = this.itemsArray()[this.highlightedIndex];
+        break;
+      }
+      this.highlightedItem.classList.add(this.highlightClass);
     }
-    this.highlightedItem.classList.add(this.highlightClass);
-    this.highlightedIndex = index;
   }
 
   highlightNextItem() {
-    this.highlightItem(this.highlightedItem[highlightedIndex + 1]);
+    this.highlightItem(this.highlightedIndex + 1);
   }
 
   highlightPreviousItem() {
-    this.highlightItem(this.highlightedItem[highlightedIndex - 1]);
+    this.highlightItem(this.highlightedIndex - 1);
   }
 
   itemsArray() {
@@ -86,7 +110,9 @@ class Dropdown {
   }
 
   clear() {
-
+    this.highlightedItem = null;
+    this.highlightedIndex = -1;
+    this.dropdownItemsList.innerHTML = '';
   }
 
   message(msg) {
@@ -114,7 +140,7 @@ class Input {
   }
 
   addSelectedItem(item) {
-
+    console.log(item.target.innerHTML);
   }
 
   removeSelectedItem() {
