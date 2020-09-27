@@ -32,19 +32,25 @@ class MultiselectAutocomplete {
           break;
       }
     });
+    this.addToSelected = this.addToSelected.bind(this);
   }
 
   requestItems(inputValue) {
     fetch(requestURL + inputValue)
-    .then((response) => response.json())
-    .then((data) => {
-      this.dropdown.populate(data, this.input.addSelectedItem);
+    .then(response => response.json())
+    .then(data => {
+      this.dropdown.populate(data, this.addToSelected);
     })
-    .catch((error) => this.dropdown.message('Nothing found'));
+    .catch(error => this.dropdown.message('Nothing found'));
     this.dropdown.message('Searching...');
   }
 
+  addToSelected(item) {
+    this.input.addSelectedItem(item);
+    this.dropdown.clear();
+  }
 }
+
 
 class Dropdown {
   constructor() {
@@ -67,10 +73,7 @@ class Dropdown {
     });
     this.dropdownItemsList.innerHTML = dropdownElementsString;
     this.highlightItem(0);
-    this.itemsArray().forEach(item => {
-      console.log(item);
-      item.addEventListener('click', addToSelectedCallback);
-    });
+    this.itemsArray().forEach(item => item.addEventListener('click', e => addToSelectedCallback(e.target.innerHTML)));
   }
 
   highlightItem(index) {
@@ -137,18 +140,31 @@ class Input {
     this.textInput.autocomplete = 'off';
     this.input.appendChild(this.selectedItemsList);
     this.input.appendChild(this.textInput);
+
+    this.removeSelectedItem = this.removeSelectedItem.bind(this);
   }
 
   addSelectedItem(item) {
-    console.log(item.target.innerHTML);
+    const li = document.createElement('li');
+    li.classList.add('multiselect-autocomplete-selected-item');
+    li.innerHTML = `<span>${item}</span>`;
+    const i = document.createElement('i');
+    i.classList.add('material-icons');
+    i.innerHTML = 'clear';
+    i.addEventListener('click', this.removeSelectedItem);
+    li.appendChild(i);
+    this.selectedItemsList.appendChild(li);
+    this.textInput.value = '';
   }
 
-  removeSelectedItem() {
-
+  removeSelectedItem(item) {
+    console.log('Remove: ' + item.target.innerHTML);
   }
 
-  isItemSelected(item) {
+  isItemSelected(item) {}
 
+  itemsArray() {
+    return Array.from(this.selectedItemsList.children);
   }
 
   toNode() {
