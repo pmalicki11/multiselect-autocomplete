@@ -154,7 +154,7 @@ class Input {
     this.textInput.autocomplete = 'off';
     this.input.appendChild(this.selectedItemsList);
     this.input.appendChild(this.textInput);
-
+    this.input.addEventListener('click', e => this.focusInput());
     this.removeSelectedItem = this.removeSelectedItem.bind(this);
   }
 
