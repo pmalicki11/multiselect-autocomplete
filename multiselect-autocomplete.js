@@ -9,6 +9,7 @@ class MultiselectAutocomplete {
     this.component.appendChild(dropdown.toNode());
     this.selectedItems = [];
     this.addToSelected = this.addToSelected.bind(this);
+    this.removeFromSelected = this.removeFromSelected.bind(this);
 
     this.input.textInput.addEventListener('input', e => {
       if(e.target.value != '') {
@@ -17,6 +18,8 @@ class MultiselectAutocomplete {
         this.dropdown.clear();
       }
     });
+
+    this.input.input.addEventListener('click', e => this.input.focusInput());
 
     this.input.textInput.addEventListener('keydown', e => {
       switch(e.key) {
@@ -35,7 +38,12 @@ class MultiselectAutocomplete {
         case 'Enter':
           e.preventDefault();
           if(this.dropdown.highlightedIndex >= 0) {
-            this.addToSelected(this.dropdown.itemsArray[this.dropdown.highlightedIndex].innerHTML);
+            this.addToSelected(this.dropdown.itemsArray[this.dropdown.highlightedIndex]);
+          }
+          break;
+        case 'Backspace':
+          if(this.selectedItems.length > 0 && e.target.value.length == 0) {
+            this.removeLastFromSelected();
           }
           break;
       }
@@ -51,10 +59,21 @@ class MultiselectAutocomplete {
   }
 
   addToSelected(item) {
-    this.input.addSelectedItem(item);
-    this.selectedItems.push(item);
+    this.input.addSelectedItem(item.innerHTML, this.removeFromSelected);
+    this.selectedItems.push(item.innerHTML);
     this.dropdown.clear();
     this.input.focusInput();
+  }
+
+  removeFromSelected(item) {
+    this.input.removeSelectedItem(item);
+    const index = this.selectedItems.indexOf(item.children[0].innerHTML);
+    this.selectedItems.splice(index, 1);
+  }
+
+  removeLastFromSelected() {
+    this.input.removeLastItem();
+    this.selectedItems.pop();
   }
 }
 
@@ -62,12 +81,11 @@ class MultiselectAutocomplete {
 class Dropdown {
   constructor() {
     this.dropdown = document.createElement('div');
-    this.dropdown.classList.add('multiselect-autocomplete-dropdown');
-    this.dropdownItemsList = document.createElement('ul');
-    this.dropdownItemsList.classList.add('multiselect-autocomplete-dropdown-items');
+    this.dropdownItemsList = document.createElement('div');
+    this.dropdownItemsList.classList.add('list-group', 'mt-0');
     this.dropdown.appendChild(this.dropdownItemsList);
     this.highlightedItem = null;
-    this.highlightClass = 'multiselect-autocomplete-dropdown-item-highlighted';
+    this.highlightClass = 'active';
     this.highlightedIndex = -1;
     this.itemsArray = [];
   }
@@ -76,7 +94,7 @@ class Dropdown {
     let dropdownElementsString = '';
     items.forEach(item => {
       if(!selectedItems.includes(item)) {
-        dropdownElementsString += `<li class="multiselect-dropdown-item">${item}</li>`;
+        dropdownElementsString += `<div class="list-group-item p-2">${item}</div>`;
       }
     });
     if(dropdownElementsString.length == 0) {
@@ -85,7 +103,7 @@ class Dropdown {
     this.dropdownItemsList.innerHTML = dropdownElementsString;
     
     Array.from(this.dropdownItemsList.children).forEach((item, index) => {
-      item.addEventListener('click', e => addToSelectedCallback(e.target.innerHTML));
+      item.addEventListener('click', e => addToSelectedCallback(e.target));
       item.addEventListener('mouseover', e => this.highlightItem(index));
       this.itemsArray.push(item);
     });
@@ -133,7 +151,7 @@ class Dropdown {
   }
 
   message(msg) {
-    this.dropdownItemsList.innerHTML = `<li>${msg}</li>`;
+    this.dropdownItemsList.innerHTML = `<div class="list-group-item p-2">${msg}</div>`;
   }
 
   toNode() {
@@ -145,34 +163,42 @@ class Dropdown {
 class Input {
   constructor() {
     this.input = document.createElement('div');
-    this.input.classList.add('multiselect-autocomplete-input');
-    this.selectedItemsList = document.createElement('ul');
-    this.selectedItemsList.classList.add('multiselect-autocomplete-selected-items');
+    this.input.classList.add('form-group', 'border', 'rounded', 'mb-0');
+    this.selectedItemsList = document.createElement('div');
+    this.selectedItemsList.classList.add('d-block');
     this.textInput = document.createElement('input');
-    this.textInput.classList.add('multiselect-autocomplete-text-input');
     this.textInput.type = 'text';
+    this.textInput.classList.add('d-inline-flex', 'border-0', 'border-0-on-focus');
     this.textInput.autocomplete = 'off';
     this.input.appendChild(this.selectedItemsList);
     this.input.appendChild(this.textInput);
-    this.input.addEventListener('click', e => this.focusInput());
     this.removeSelectedItem = this.removeSelectedItem.bind(this);
   }
 
-  addSelectedItem(item) {
-    const li = document.createElement('li');
-    li.classList.add('multiselect-autocomplete-selected-item');
-    li.innerHTML = `<span>${item}</span>`;
+  addSelectedItem(item, removeItemCallback) {
+    const div = document.createElement('div');
+    div.classList.add('badge', 'badge-secondary', 'd-inline-flex', 'align-items-center', 'mt-1', 'ml-1');
+    const span = document.createElement('span');
+    span.classList.add('badge-text', 'font-weight-normal');
+    span.innerHTML = item;
+    
     const i = document.createElement('i');
     i.classList.add('material-icons');
     i.innerHTML = 'clear';
-    i.addEventListener('click', this.removeSelectedItem);
-    li.appendChild(i);
-    this.selectedItemsList.appendChild(li);
+    i.addEventListener('click', e => removeItemCallback(div));
+    
+    div.appendChild(span);
+    div.appendChild(i);
+    this.selectedItemsList.appendChild(div);
     this.textInput.value = '';
   }
 
   removeSelectedItem(item) {
-    console.log('Remove: ' + item.target.innerHTML);
+    this.selectedItemsList.removeChild(item);
+  }
+
+  removeLastItem() {
+    this.selectedItemsList.removeChild(this.selectedItemsList.lastChild);
   }
 
   focusInput() {
@@ -189,8 +215,5 @@ class Input {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-  const multiselectAutocomplete = new MultiselectAutocomplete(
-    new Input(),
-    new Dropdown()
-  );
+  const multiselectAutocomplete = new MultiselectAutocomplete(new Input(), new Dropdown());
 });
