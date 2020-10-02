@@ -1,0 +1,8 @@
+.badge-text {
+    font-size: 130%;
+}
+
+.border-0-on-focus {
+	border-style: none;
+	outline: none;
+  }
