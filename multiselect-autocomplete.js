@@ -177,7 +177,7 @@ class Input {
     this.selectedItemsList.classList.add('d-block');
     this.textInput = document.createElement('input');
     this.textInput.type = 'text';
-    this.textInput.classList.add('d-inline-flex', 'border-0', 'border-0-on-focus', 'py-6', 'px-12');
+    this.textInput.classList.add('d-inline-flex', 'border-0', 'rounded', 'py-6', 'px-12');
     this.textInput.autocomplete = 'off';
     this.input.appendChild(this.selectedItemsList);
     this.input.appendChild(this.textInput);
