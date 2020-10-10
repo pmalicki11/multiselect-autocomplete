@@ -90,7 +90,7 @@ class Dropdown {
   constructor() {
     this.dropdown = document.createElement('div');
     this.dropdownItemsList = document.createElement('div');
-    this.dropdownItemsList.classList.add('list-group', 'mt-0');
+    this.dropdownItemsList.classList.add('list-group', 'mt-0', 'position-absolute', 'dropdown-overlay');
     this.dropdown.appendChild(this.dropdownItemsList);
     this.highlightedItem = null;
     this.highlightClass = 'active';
