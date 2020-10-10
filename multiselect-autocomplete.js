@@ -19,6 +19,14 @@ class MultiselectAutocomplete {
       }
     });
 
+    this.input.textInput.addEventListener('focus', e => {
+      this.input.input.classList.add('multiselect-autocomplete-input-focus');
+    });
+    
+    this.input.textInput.addEventListener('blur', e => {
+      this.input.input.classList.remove('multiselect-autocomplete-input-focus');
+    });
+
     this.input.input.addEventListener('click', e => this.input.focusInput());
 
     this.input.textInput.addEventListener('keydown', e => {
@@ -91,6 +99,7 @@ class Dropdown {
   }
 
   populate(items, selectedItems, addToSelectedCallback) {
+    this.clear();
     let dropdownElementsString = '';
     items.forEach(item => {
       if(!selectedItems.includes(item)) {
@@ -163,16 +172,15 @@ class Dropdown {
 class Input {
   constructor() {
     this.input = document.createElement('div');
-    this.input.classList.add('form-group', 'border', 'rounded', 'mb-0');
+    this.input.classList.add('multiselect-autocomplete-input');
     this.selectedItemsList = document.createElement('div');
     this.selectedItemsList.classList.add('d-block');
     this.textInput = document.createElement('input');
     this.textInput.type = 'text';
-    this.textInput.classList.add('d-inline-flex', 'border-0', 'border-0-on-focus');
+    this.textInput.classList.add('d-inline-flex', 'border-0', 'border-0-on-focus', 'py-6', 'px-12');
     this.textInput.autocomplete = 'off';
     this.input.appendChild(this.selectedItemsList);
     this.input.appendChild(this.textInput);
-    this.removeSelectedItem = this.removeSelectedItem.bind(this);
   }
 
   addSelectedItem(item, removeItemCallback) {
