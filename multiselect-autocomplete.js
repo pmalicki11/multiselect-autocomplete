@@ -18,16 +18,26 @@ class MultiselectAutocomplete {
         this.dropdown.clear();
       }
     });
-
+    
     this.input.textInput.addEventListener('focus', e => {
       this.input.input.classList.add('multiselect-autocomplete-input-focus');
     });
-    
+
     this.input.textInput.addEventListener('blur', e => {
-      this.input.input.classList.remove('multiselect-autocomplete-input-focus');
+      if(this.itemAdded) {
+        this.input.focusInput();
+        this.itemAdded = false;
+      }
+      else {
+        this.input.textInput.value = '';
+        this.dropdown.clear();
+        this.input.input.classList.remove('multiselect-autocomplete-input-focus');
+      }
     });
 
-    this.input.input.addEventListener('click', e => this.input.focusInput());
+    this.input.input.addEventListener('click', e => {
+      this.input.focusInput();
+    });
 
     this.input.textInput.addEventListener('keydown', e => {
       switch(e.key) {
@@ -36,7 +46,7 @@ class MultiselectAutocomplete {
           this.dropdown.highlightNextItem();
           break;
         case 'ArrowUp':
-          e.preventDefault();
+          e.preventDefault();6
           this.dropdown.highlightPreviousItem();
           break;
         case 'Escape':
@@ -70,6 +80,7 @@ class MultiselectAutocomplete {
     this.input.addSelectedItem(item.innerHTML, this.removeFromSelected);
     this.selectedItems.push(item.innerHTML);
     this.dropdown.clear();
+    this.itemAdded = true;
     this.input.focusInput();
   }
 
@@ -112,7 +123,7 @@ class Dropdown {
     this.dropdownItemsList.innerHTML = dropdownElementsString;
     
     Array.from(this.dropdownItemsList.children).forEach((item, index) => {
-      item.addEventListener('click', e => addToSelectedCallback(e.target));
+      item.addEventListener('mousedown', e => addToSelectedCallback(e.target));
       item.addEventListener('mouseover', e => this.highlightItem(index));
       this.itemsArray.push(item);
     });
@@ -159,6 +170,7 @@ class Dropdown {
     this.dropdownItemsList.innerHTML = '';
   }
 
+
   message(msg) {
     this.dropdownItemsList.innerHTML = `<div class="list-group-item p-2">${msg}</div>`;
   }
@@ -194,9 +206,22 @@ class Input {
     i.classList.add('material-icons');
     i.innerHTML = 'clear';
     i.addEventListener('click', e => removeItemCallback(div));
-    
+
+    //<input type="text"  name="phone" style="display:none;" value="add_some_phone_number"/> 
+    const input = document.createElement('input');
+    Object.assign(input, {
+      className: 'd-none',
+      type: 'text',
+      name: 'multiselectOption[]',
+      value: item
+    });
+
+
+
     div.appendChild(span);
     div.appendChild(i);
+    div.appendChild(input);
+
     this.selectedItemsList.appendChild(div);
     this.textInput.value = '';
   }
