@@ -20,23 +20,33 @@ class MultiselectAutocomplete {
     });
     
     this.input.textInput.addEventListener('focus', e => {
+      console.log('focusEvent start');
       this.input.input.classList.add('multiselect-autocomplete-input-focus');
+      console.log('active element - ' + document.activeElement);
+      console.log('focusEvent end');
     });
 
     this.input.textInput.addEventListener('blur', e => {
       if(this.itemAdded) {
-        this.input.focusInput();
+        console.log('blurEvent - item added');
+        
+        console.log('active element - ' + document.activeElement);
         this.itemAdded = false;
-      }
-      else {
+      } else {
+        console.log('blurEvent - other reason');
         this.input.textInput.value = '';
         this.dropdown.clear();
         this.input.input.classList.remove('multiselect-autocomplete-input-focus');
+        console.log('active element - ' + document.activeElement);
       }
+      console.log('blurEvent end');
     });
 
+
     this.input.input.addEventListener('click', e => {
-      this.input.focusInput();
+      if(e.target.tagName != 'INPUT') {
+        this.input.focusInput();
+      } 
     });
 
     this.input.textInput.addEventListener('keydown', e => {
@@ -77,11 +87,14 @@ class MultiselectAutocomplete {
   }
 
   addToSelected(item) {
+    console.log('adding item start');
     this.input.addSelectedItem(item.innerHTML, this.removeFromSelected);
     this.selectedItems.push(item.innerHTML);
     this.dropdown.clear();
     this.itemAdded = true;
-    this.input.focusInput();
+    setTimeout(e => e.input.focusInput(), 1, this);
+    console.log('active element - ' + document.activeElement);
+    console.log('adding item end');
   }
 
   removeFromSelected(item) {
@@ -207,7 +220,6 @@ class Input {
     i.innerHTML = 'clear';
     i.addEventListener('click', e => removeItemCallback(div));
 
-    //<input type="text"  name="phone" style="display:none;" value="add_some_phone_number"/> 
     const input = document.createElement('input');
     Object.assign(input, {
       className: 'd-none',
@@ -215,8 +227,6 @@ class Input {
       name: 'multiselectOption[]',
       value: item
     });
-
-
 
     div.appendChild(span);
     div.appendChild(i);
@@ -235,7 +245,10 @@ class Input {
   }
 
   focusInput() {
+    console.log('invoke focus start');
     this.textInput.focus();
+    console.log('active element - ' + document.activeElement);
+    console.log('invoke focus end');
   }
 
   itemsArray() {
