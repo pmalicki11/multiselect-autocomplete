@@ -33,7 +33,6 @@ class MultiselectAutocomplete {
       }
     });
 
-
     this.input.input.addEventListener('click', e => {
       if(e.target.tagName != 'INPUT') {
         this.input.focusInput();
