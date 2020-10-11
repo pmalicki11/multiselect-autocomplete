@@ -1,3 +1,7 @@
+.badge {
+  cursor: default;
+}
+
 .badge-text {
     font-size: 130%;
 }
