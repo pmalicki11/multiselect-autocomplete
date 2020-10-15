@@ -134,7 +134,9 @@ class Dropdown {
       } else {
         console.log('Items added to dropdown: ' + i);
         console.log('Remaining items: ' + (elementsTotal - i));
-        this.dropdownItemsList.innerHTML += `<span>+${elementsTotal - i} items</span>`;
+        const remainingElements = elementsTotal - i;
+        const rStr = (remainingElements > 1) ? 'items' : 'item';
+        this.dropdownItemsList.innerHTML += `<span class="text-right text-info font-weight-bold">+${remainingElements} ${rStr}</span>`;
         break;
       }
     }
