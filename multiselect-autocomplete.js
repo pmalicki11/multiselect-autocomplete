@@ -1,4 +1,5 @@
 const requestURL = 'https://pmalicki.com/alergens/products/ajax?namepart=';
+const maxResults = 5;
 
 class MultiselectAutocomplete {
   constructor(input, dropdown) {
@@ -111,21 +112,39 @@ class Dropdown {
 
   populate(items, selectedItems, addToSelectedCallback) {
     this.clear();
-    let dropdownElementsString = '';
+    let elementsToAdd = [];
     items.forEach(item => {
       if(!selectedItems.includes(item)) {
-        dropdownElementsString += `<div class="list-group-item p-2">${item}</div>`;
+        elementsToAdd.push(item);
       }
     });
-    if(dropdownElementsString.length == 0) {
+
+    if(elementsToAdd.length == 0) {
       throw 'Nothing added';
     }
-    this.dropdownItemsList.innerHTML = dropdownElementsString;
+
+
+    console.log(elementsToAdd);
+
+    const elementsTotal = elementsToAdd.length;
+    let i;
+    for(i = 0; i < elementsTotal; i++) {
+      if(i < maxResults) {
+        this.dropdownItemsList.innerHTML += `<div class="list-group-item p-2">${elementsToAdd[i]}</div>`;
+      } else {
+        console.log('Items added to dropdown: ' + i);
+        console.log('Remaining items: ' + (elementsTotal - i));
+        this.dropdownItemsList.innerHTML += `<span>+${elementsTotal - i} items</span>`;
+        break;
+      }
+    }
     
     Array.from(this.dropdownItemsList.children).forEach((item, index) => {
-      item.addEventListener('mousedown', e => addToSelectedCallback(e.target));
-      item.addEventListener('mouseover', e => this.highlightItem(index));
-      this.itemsArray.push(item);
+      if(item.tagName === 'DIV') {
+        item.addEventListener('mousedown', e => addToSelectedCallback(e.target));
+        item.addEventListener('mouseover', e => this.highlightItem(index));
+        this.itemsArray.push(item);
+      }
     });
 
     this.highlightItem(0);
