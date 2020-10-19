@@ -3,13 +3,17 @@ document.addEventListener('DOMContentLoaded', function() {
   const multiselectAutocomplete1 = new MultiselectAutocomplete({
     "element": document.querySelector('.multiselect-autocomplete-1'),
     "requestURL": "https://pmalicki.com/alergens/products/ajax?namepart=",
+    "inputValueAsRequestPart": true,
+    "filterRequestDataByInput": false,
     "maxDropdownItems": 5 
   });
 
   const multiselectAutocomplete2 = new MultiselectAutocomplete({
     "element": document.querySelector('.multiselect-autocomplete-2'),
-    "requestURL": "https://pmalicki.com/alergens/products/ajax?namepart=",
-    "maxDropdownItems": 6 
+    "requestURL": "https://run.mocky.io/v3/530a0a11-fb6e-4afd-bb42-dc55f91bb6d1",
+    "inputValueAsRequestPart": false,
+    "filterRequestDataByInput": true,
+    "maxDropdownItems": 10
   });
 });
 
@@ -21,6 +25,16 @@ class MultiselectAutocomplete {
     
     if(params.hasOwnProperty('requestURL')) { this.requestURL = params.requestURL; }
     else { throw 'Error: No Request URL set in constructor params.'; }
+
+    this.inputValueAsRequestPart = false;
+    if(params.hasOwnProperty('inputValueAsRequestPart') && params.inputValueAsRequestPart) {
+      this.inputValueAsRequestPart = true;
+    }
+
+    this.filterRequestDataByInput = true;
+    if(params.hasOwnProperty('filterRequestDataByInput') && !params.filterRequestDataByInput) {
+      this.filterRequestDataByInput = false;
+    }
 
     this.maxDropdownItems = 5;
     if(params.hasOwnProperty('maxDropdownItems') && params.maxDropdownItems > 5) {
@@ -37,7 +51,7 @@ class MultiselectAutocomplete {
 
     this.input.textInput.addEventListener('input', e => {
       if(e.target.value != '') {
-        this.requestItems(e.target.value, this.requestURL);
+        this.requestItems(e.target.value, this.requestURL, this.inputValueAsRequestPart, this.filterRequestDataByInput);
       } else {
         this.dropdown.clear();
       }
@@ -92,12 +106,29 @@ class MultiselectAutocomplete {
     });
   }
 
-  requestItems(inputValue, requestURL) {
-    fetch(requestURL + inputValue)
+  requestItems(inputValue, requestURL, inputValueAsRequestPart, filterRequestDataByInput) {
+    const requestString = inputValueAsRequestPart ? requestURL + inputValue : requestURL;
+    fetch(requestString)
     .then(response => response.json())
-    .then(data => this.dropdown.populate(data, this.selectedItems, this.addToSelected, this.maxDropdownItems))
+    .then(data => {
+      let filteredData = [];
+      if(filterRequestDataByInput) {
+        const searchPattern = new RegExp('^' + inputValue, 'i');
+        data.forEach(item => {
+          if(searchPattern.test(item)) {
+            filteredData.push(item);
+          }
+        });
+      } else {
+        filteredData = data;
+      }
+      this.dropdown.populate(filteredData, this.selectedItems, this.addToSelected, this.maxDropdownItems);
+    })
     .catch(error => this.dropdown.message('Nothing found'));
-    this.dropdown.message('Searching...');
+    this.dropdown.message(`
+      <span class="spinner-border spinner-border-sm text-primary aria-hidden="true"" role="status"></span>
+      <span>Searching...</span>
+    `);
   }
 
   addToSelected(item) {
