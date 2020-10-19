@@ -1,20 +1,43 @@
-const requestURL = 'https://pmalicki.com/alergens/products/ajax?namepart=';
-const maxResults = 5;
+document.addEventListener('DOMContentLoaded', function() {
+
+  const multiselectAutocomplete1 = new MultiselectAutocomplete({
+    "element": document.querySelector('.multiselect-autocomplete-1'),
+    "requestURL": "https://pmalicki.com/alergens/products/ajax?namepart=",
+    "maxDropdownItems": 5 
+  });
+
+  const multiselectAutocomplete2 = new MultiselectAutocomplete({
+    "element": document.querySelector('.multiselect-autocomplete-2'),
+    "requestURL": "https://pmalicki.com/alergens/products/ajax?namepart=",
+    "maxDropdownItems": 6 
+  });
+});
+
 
 class MultiselectAutocomplete {
-  constructor(input, dropdown) {
-    this.component = document.querySelector('.multiselect-autocomplete');
-    this.input = input;
-    this.dropdown = dropdown;
-    this.component.appendChild(input.toNode());
-    this.component.appendChild(dropdown.toNode());
+  constructor(params) {
+    if(params.hasOwnProperty('element')) { this.component = params.element; }
+    else { throw 'Error: No Element set in constructor params.'; }
+    
+    if(params.hasOwnProperty('requestURL')) { this.requestURL = params.requestURL; }
+    else { throw 'Error: No Request URL set in constructor params.'; }
+
+    this.maxDropdownItems = 5;
+    if(params.hasOwnProperty('maxDropdownItems') && params.maxDropdownItems > 5) {
+      this.maxDropdownItems = params.maxDropdownItems;
+    }
+    
+    this.input = new Input();
+    this.dropdown = new Dropdown();
+    this.component.appendChild(this.input.toNode());
+    this.component.appendChild(this.dropdown.toNode());
     this.selectedItems = [];
     this.addToSelected = this.addToSelected.bind(this);
     this.removeFromSelected = this.removeFromSelected.bind(this);
 
     this.input.textInput.addEventListener('input', e => {
       if(e.target.value != '') {
-        this.requestItems(e.target.value);
+        this.requestItems(e.target.value, this.requestURL);
       } else {
         this.dropdown.clear();
       }
@@ -69,10 +92,10 @@ class MultiselectAutocomplete {
     });
   }
 
-  requestItems(inputValue) {
+  requestItems(inputValue, requestURL) {
     fetch(requestURL + inputValue)
     .then(response => response.json())
-    .then(data => this.dropdown.populate(data, this.selectedItems, this.addToSelected))
+    .then(data => this.dropdown.populate(data, this.selectedItems, this.addToSelected, this.maxDropdownItems))
     .catch(error => this.dropdown.message('Nothing found'));
     this.dropdown.message('Searching...');
   }
@@ -110,7 +133,7 @@ class Dropdown {
     this.itemsArray = [];
   }
 
-  populate(items, selectedItems, addToSelectedCallback) {
+  populate(items, selectedItems, addToSelectedCallback, maxDropdownItems) {
     this.clear();
     let elementsToAdd = [];
     items.forEach(item => {
@@ -123,17 +146,12 @@ class Dropdown {
       throw 'Nothing added';
     }
 
-
-    console.log(elementsToAdd);
-
     const elementsTotal = elementsToAdd.length;
     let i;
     for(i = 0; i < elementsTotal; i++) {
-      if(i < maxResults) {
+      if(i < maxDropdownItems) {
         this.dropdownItemsList.innerHTML += `<div class="list-group-item p-2">${elementsToAdd[i]}</div>`;
       } else {
-        console.log('Items added to dropdown: ' + i);
-        console.log('Remaining items: ' + (elementsTotal - i));
         const remainingElements = elementsTotal - i;
         const rStr = (remainingElements > 1) ? 'items' : 'item';
         this.dropdownItemsList.innerHTML += `<span class="text-right text-info font-weight-bold">+${remainingElements} ${rStr}</span>`;
@@ -264,7 +282,3 @@ class Input {
     return this.input;
   }
 }
-
-document.addEventListener('DOMContentLoaded', function() {
-  const multiselectAutocomplete = new MultiselectAutocomplete(new Input(), new Dropdown());
-});
