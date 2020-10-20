@@ -1,0 +1,1 @@
+document.write('<span class="text-primary">&lt;div</span> <span class="text-info">class</span>=<span class="text-danger">"multiselect-autocomplete"</span><span class="text-primary">&gt;&lt;/div&gt;</span>');

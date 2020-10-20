@@ -1,5 +1,5 @@
-document.addEventListener('DOMContentLoaded', function() {
-
+document.addEventListener('DOMContentLoaded', () => {
+console.log(document.querySelector('.multiselect-autocomplete-1'));
   const multiselectAutocomplete1 = new MultiselectAutocomplete({
     "element": document.querySelector('.multiselect-autocomplete-1'),
     "requestURL": "https://pmalicki.com/alergens/products/ajax?namepart=",
@@ -20,8 +20,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
 class MultiselectAutocomplete {
   constructor(params) {
-    if(params.hasOwnProperty('element')) { this.component = params.element; }
-    else { throw 'Error: No Element set in constructor params.'; }
+    this.component = document.querySelector('.multiselect-autocomplete');
+    if(params.hasOwnProperty('element') && params.element != null) { this.component = params.element; }
     
     if(params.hasOwnProperty('requestURL')) { this.requestURL = params.requestURL; }
     else { throw 'Error: No Request URL set in constructor params.'; }
