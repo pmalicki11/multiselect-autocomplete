@@ -5,7 +5,8 @@ console.log(document.querySelector('.multiselect-autocomplete-1'));
     "requestURL": "https://pmalicki.com/alergens/products/ajax?namepart=",
     "inputValueAsRequestPart": true,
     "filterRequestDataByInput": false,
-    "maxDropdownItems": 5 
+    "maxDropdownItems": 5,
+    "bootstrapStyle": true
   });
 
   const multiselectAutocomplete2 = new MultiselectAutocomplete({
@@ -13,7 +14,8 @@ console.log(document.querySelector('.multiselect-autocomplete-1'));
     "requestURL": "https://run.mocky.io/v3/530a0a11-fb6e-4afd-bb42-dc55f91bb6d1",
     "inputValueAsRequestPart": false,
     "filterRequestDataByInput": true,
-    "maxDropdownItems": 10
+    "maxDropdownItems": 10,
+    "bootstrapStyle": true
   });
 });
 
@@ -40,8 +42,13 @@ class MultiselectAutocomplete {
     if(params.hasOwnProperty('maxDropdownItems') && params.maxDropdownItems > 5) {
       this.maxDropdownItems = params.maxDropdownItems;
     }
-    
-    this.input = new Input();
+
+    this.bootstrapStyle = false;
+    if(params.hasOwnProperty('bootstrapStyle') && params.bootstrapStyle) {
+      this.bootstrapStyle = true;
+    }
+  
+    this.input = new Input(this.bootstrapStyle);
     this.dropdown = new Dropdown();
     this.component.appendChild(this.input.toNode());
     this.component.appendChild(this.dropdown.toNode());
@@ -58,7 +65,9 @@ class MultiselectAutocomplete {
     });
     
     this.input.textInput.addEventListener('focus', e => {
-      this.input.input.classList.add('multiselect-autocomplete-input-focus');
+      if(this.bootstrapStyle) {
+        this.input.input.classList.add('multiselect-autocomplete-input-focus');
+      }
     });
 
     this.input.textInput.addEventListener('blur', e => {
@@ -67,7 +76,9 @@ class MultiselectAutocomplete {
       } else {
         this.input.textInput.value = '';
         this.dropdown.clear();
-        this.input.input.classList.remove('multiselect-autocomplete-input-focus');
+        if(this.bootstrapStyle) {
+          this.input.input.classList.remove('multiselect-autocomplete-input-focus');
+        }
       }
     });
 
@@ -240,7 +251,6 @@ class Dropdown {
     this.dropdownItemsList.innerHTML = '';
   }
 
-
   message(msg) {
     this.dropdownItemsList.innerHTML = `<div class="list-group-item p-2">${msg}</div>`;
   }
@@ -252,9 +262,13 @@ class Dropdown {
 
 
 class Input {
-  constructor() {
+  constructor(bootstrapStyle) {
     this.input = document.createElement('div');
-    this.input.classList.add('multiselect-autocomplete-input');
+    if(bootstrapStyle) {
+      this.input.classList.add('multiselect-autocomplete-input');
+    } else {
+      this.input.classList.add('multiselect-autocomplete-input-std');
+    }
     this.selectedItemsList = document.createElement('div');
     this.selectedItemsList.classList.add('d-block');
     this.textInput = document.createElement('input');
