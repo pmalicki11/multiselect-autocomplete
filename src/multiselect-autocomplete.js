@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
 console.log(document.querySelector('.multiselect-autocomplete-1'));
   const multiselectAutocomplete1 = new MultiselectAutocomplete({
     "element": document.querySelector('.multiselect-autocomplete-1'),
-    "requestURL": "https://pmalicki.com/alergens/products/ajax?namepart=",
+    "requestURL": "https://pml.software/foodregistration/api/ingredients/getList?namepart=",
     "inputValueAsRequestPart": true,
     "filterRequestDataByInput": false,
     "maxDropdownItems": 5,
