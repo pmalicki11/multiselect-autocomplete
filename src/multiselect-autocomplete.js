@@ -1,16 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
-console.log(document.querySelector('.multiselect-autocomplete-1'));
-  const multiselectAutocomplete1 = new MultiselectAutocomplete({
-    "element": document.querySelector('.multiselect-autocomplete-1'),
-    "requestURL": "https://pml.software/foodregistration/api/ingredients/getList?namepart=",
-    "inputValueAsRequestPart": true,
-    "filterRequestDataByInput": false,
-    "maxDropdownItems": 5,
-    "bootstrapStyle": true
-  });
 
   const multiselectAutocomplete2 = new MultiselectAutocomplete({
-    "element": document.querySelector('.multiselect-autocomplete-2'),
+    "element": document.querySelector('.multiselect-autocomplete'),
     "requestURL": "https://run.mocky.io/v3/530a0a11-fb6e-4afd-bb42-dc55f91bb6d1",
     "inputValueAsRequestPart": false,
     "filterRequestDataByInput": true,

@@ -40,8 +40,7 @@ const redElements = [
   '"control-label col-md-3 font-weight-bold"',
   '"col-md-5"',
   '"col-md-9"',
-  '"multiselect-autocomplete-1"',
-  '"multiselect-autocomplete-2"',
+  '"multiselect-autocomplete"',
   '"submit"',
   '"btn btn-primary"'
 ];
