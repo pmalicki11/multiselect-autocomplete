@@ -2,7 +2,7 @@
 JS Component. Input with multiselect and autocomplete functionality.
 
 Preview here*
-https://pmalicki.com/multiselect-autocomplete/
+https://pml.software/multiselect-autocomplete/
 
 or here
 https://pmalicki11.github.io/multiselect-autocomplete/
