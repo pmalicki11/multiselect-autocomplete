@@ -20,7 +20,7 @@
           It comes with the autocomplete functionality that could be bind to external API.
           It all arose as a result of the need to use such a solution on one of my webpages.
           Plus, it gave me a great opportunity to learn Vanilla JavaScript and lot of fun of course.
-          Of course it may have and probably has bugs. I am updating source code from time to time.
+          Of course it may have and probably has bugs.
         </p>
         <div class="align-items-center py-4 m-1">
           <a class="text-center" href="https://pml.software/multiselect-autocomplete/src/multiselect-autocomplete.zip">
