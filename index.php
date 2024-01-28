@@ -71,31 +71,20 @@
       
       <div class="py-5">
         
-        <h3>How to use</h3>
+        <h3>Installation</h3>
         <p class="lead">
           Following steps are describing what to do before use.
         </p>
         
         <div class="mb-2">
           <h5 class="mt-2 ml-3">
-            1. Download source code of component from
-            <a href="https://pml.software/multiselect-autocomplete/src/multiselect-autocomplete.zip"><u>here</u></a>
+            1. Download following files from
+            <a href="https://github.com/pmalicki11/multiselect-autocomplete/tree/master/src"><u>here</u></a>
             and paste it in your project directory.</h5>
-          <p class="lead ml-3">You will need a source code of component to make it working.</p>
           <div class="container-fluid bg-light p-2 mb-3 border">
             <ol class="mb-0">
               <li>multiselect-autocomplete.js</li>
               <li>multiselect-autocomplete.css</li>
-            </ol>
-          </div>
-          <p class="lead ml-3">
-            In addition there is also required to download some files of
-            <a href="https://getbootstrap.com"><u>Bootstrap css library</u></a>.
-            You can take them either from official Bootstrap webpage or from
-            <a href="https://github.com/pmalicki11/multiselect-autocomplete"><u>GitHub repository of this project</u></a>.
-          </p>
-          <div class="container-fluid bg-light p-2 border">
-            <ol class="mb-0">
               <li>bootstrap.min.css</li>
               <li>bootstrap.min.css.map</li>
             </ol>
