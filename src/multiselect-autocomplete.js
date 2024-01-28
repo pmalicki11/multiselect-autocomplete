@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const multiselectAutocomplete2 = new MultiselectAutocomplete({
     "element": document.querySelector('.multiselect-autocomplete'),
-    "requestURL": "https://run.mocky.io/v3/530a0a11-fb6e-4afd-bb42-dc55f91bb6d1",
+    "requestURL": "https://run.mocky.io/v3/a013d8dd-fd6a-420a-95b1-bc1c89534e9e",
     "inputValueAsRequestPart": false,
     "filterRequestDataByInput": true,
     "maxDropdownItems": 10,

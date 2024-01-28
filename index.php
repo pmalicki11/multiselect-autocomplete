@@ -7,6 +7,9 @@
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css">
     <link rel="stylesheet" href="./src/bootstrap.min.css">
     <link rel="stylesheet" href="./src/multiselect-autocomplete.css">
+    <link rel="icon" href="../logos/pmlSimple.svg">
+    <link rel="mask-icon" href="../logos/pmlSimple.svg" color="#000000">
+    <link rel="apple-touch-icon" href="../logos/pmlSimple.svg">
   </head>
   <body>
     <div class="pt-5 pd-2 text-white" style="background-image: linear-gradient(0deg, rgba(26,0,177,1) 0%, rgba(19,50,56,1) 100%)">
