@@ -10,6 +10,7 @@
     <link rel="icon" href="../logos/pmlSimple.svg">
     <link rel="mask-icon" href="../logos/pmlSimple.svg" color="#000000">
     <link rel="apple-touch-icon" href="../logos/pmlSimple.svg">
+    <title>Multiselect-autocomplete - PML Software</title>
   </head>
   <body>
     <div class="pt-5 pd-2 text-white" style="background-image: linear-gradient(0deg, rgba(26,0,177,1) 0%, rgba(19,50,56,1) 100%)">
@@ -22,12 +23,7 @@
           Plus, it gave me a great opportunity to learn Vanilla JavaScript and lot of fun of course.
           Of course it may have and probably has bugs.
         </p>
-        <div class="align-items-center py-4 m-1">
-          <a class="text-center" href="https://pml.software/multiselect-autocomplete/src/multiselect-autocomplete.zip">
-            <button class="btn btn-light p-2 rounded">Download <i class="fa fa-download"></i></button>
-          </a>
-          <span> multiselect-autocomplete.zip</span>
-        </div> 
+        <div class="align-items-center py-4 m-1"></div>
       </div>
     </div>
 
